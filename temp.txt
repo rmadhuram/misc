@@ -1,0 +1,67 @@
+Rayvant
+- Traits SQL query generation (first, last, most frequent)
+
+Amartya
+- 943, 944 
+- Redis issue
+- Dashboard queries
+
+Devyani
+- General campaign
+- Dashboard
+
+Mohan
+- Google entities & metrics fetch  
+
+Murugan
+- Traits API
+- No tickets assigned
+
+Rajesh
+- Issues from the users screen
+- Working on acct screen
+
+Vijay
+- PR for 870
+- No tickets
+
+Mathan
+- Trait creation - hide value for exist/non exist
+- Segment creation - property / value validation
+- Working on trait validation
+
+Sasi
+- Capability based menu listing
+
+Thiru
+- Segment computation, will work on audience job
+- Audience extraction 
+- segment table - review the data stored
+- ES not visible within VPC, needs to be whitelisted
+
+Jaleel
+- Setting up Airflow in dev environment
+
+Charu
+- Google ads - without campaign type objective
+- ticket related to data sources
+
+Abi 
+- Accounts & Roles 
+
+Suganth
+- Accounts & Roles Issues
+- Traits computation
+
+Mithra
+- UI & API fixes
+
+
+
+
+
+
+
+
+
+

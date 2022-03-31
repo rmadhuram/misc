@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"/>
+<meta name="description" content="Data flow or workflow graph of nodes with varying input and output ports with labels, oriented vertically."/> 
+<link rel="stylesheet" href="../assets/css/style.css"/> 
+<!-- Copyright 1998-2021 by Northwoods Software Corporation. -->
+<title>Data Flow Diagram</title>
+</head>
+
+<body>
+ 
+  <div class="md:flex flex-col md:flex-row md:min-h-screen w-full max-w-screen-xl mx-auto">
+    <!-- * * * * * * * * * * * * * -->
+    <!-- Start of GoJS sample code -->
+    
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+    <div class="p-4 w-full">
+    <script id="code">
+    function init() {
+      var $ = go.GraphObject.make;
+
+      myDiagram =
+        $(go.Diagram, "myDiagramDiv",
+          {
+            initialContentAlignment: go.Spot.Top,
+            initialAutoScale: go.Diagram.UniformToFill,
+            layout: $(go.LayeredDigraphLayout,
+              { direction: 90 }),
+            "undoManager.isEnabled": true
+          }
+        );
+
+      // when the document is modified, add a "*" to the title and enable the "Save" button
+      myDiagram.addDiagramListener("Modified", function(e) {
+        var button = document.getElementById("SaveButton");
+        if (button) button.disabled = !myDiagram.isModified;
+        var idx = document.title.indexOf("*");
+        if (myDiagram.isModified) {
+          if (idx < 0) document.title += "*";
+        } else {
+          if (idx >= 0) document.title = document.title.substr(0, idx);
+        }
+      });
+
+      // when the diagram is vertically oriented, "left" means "top" and "right" means "bottom"
+      function makePort(name, leftside) {
+        var port = $(go.Shape, "Circle",
+          {
+            fill: "black", stroke: null,
+            desiredSize: new go.Size(8, 8),
+            portId: name,  // declare this object to be a "port"
+            toMaxLinks: 1,  // don't allow more than one link into a port
+            cursor: "pointer"  // show a different cursor to indicate potential link point
+          });
+
+        var lab = $(go.TextBlock, name,  // the name of the port
+          { font: "7pt sans-serif" });
+
+        var panel = $(go.Panel, "Vertical",
+          { margin: new go.Margin(0, 2) });
+
+        if (leftside) {
+          port.toSpot = go.Spot.Top;
+          port.toLinkable = true;
+          lab.margin = new go.Margin(1, 0, 0, 1);
+          panel.alignment = go.Spot.TopLeft;
+          panel.add(port);
+          panel.add(lab);
+        } else {
+          port.fromSpot = go.Spot.Bottom;
+          port.fromLinkable = true;
+          lab.margin = new go.Margin(1, 1, 0, 0);
+          panel.alignment = go.Spot.TopRight;
+          panel.add(lab);
+          panel.add(port);
+        }
+        return panel;
+      }
+
+      function makeTemplate(typename, icon, background, inports, outports) {
+        var node = $(go.Node, "Spot",
+          $(go.Panel, "Auto",
+            { width: 240, height: 100 },
+            $(go.Shape, "RoundedRectangle",
+              {
+                fill: background,
+                stroke: "#666",
+                spot1: go.Spot.TopLeft, spot2: go.Spot.BottomRight
+              }),
+              $(go.Panel, "Table",
+                { stretch: go.GraphObject.Fill, margin: 5},
+
+                $(go.RowColumnDefinition,
+                  { column: 0, sizing: go.RowColumnDefinition.None, background: background, coversSeparators: true }),
+                $(go.RowColumnDefinition,
+                  { column: 1, minimum: 100, background: background, separatorStroke: "white" }),
+                $(go.RowColumnDefinition,
+                  { row: 0, sizing: go.RowColumnDefinition.None }),
+                $(go.RowColumnDefinition,
+                  { row: 1, separatorStroke: "white" }),
+
+
+                $(go.Picture, icon,
+                  { row: 0, column: 0, rowSpan: 2, width: 24, height: 24, margin: 6 }),
+                $(go.TextBlock, typename,
+                  { row: 0, column: 1, stretch: go.GraphObject.Horizontal, margin: 5, stroke: "#999", textAlign: "left" }),
+                $(go.TextBlock,
+                  { row: 1, column: 1, stretch: go.GraphObject.Fill, margin: 10, stroke: "#444", textAlign: "left" },
+                  new go.Binding("text", "name"))
+              ),
+          ),
+          $(go.Panel, "Horizontal",
+            {
+              alignment: go.Spot.Top,
+              alignmentFocus: new go.Spot(0.5, 0, 0, 4)
+            },
+            inports),
+          $(go.Panel, "Horizontal",
+            {
+              alignment: go.Spot.Bottom,
+              alignmentFocus: new go.Spot(0.5, 1, 0, -4)
+            },
+            outports)
+        );
+        myDiagram.nodeTemplateMap.set(typename, node);
+      }      
+
+      function makeRoundTemplate(typename, icon, background, inports, outports, size) {
+        var node = $(go.Node, "Spot",
+          $(go.Panel, "Auto",
+            { width: size, height: size },
+            $(go.Shape, "Circle",
+              {
+                fill: background,
+                stroke: "#666",
+                spot1: go.Spot.TopLeft, spot2: go.Spot.BottomRight
+              }),
+
+              $(go.TextBlock,
+                  { margin: 5, stroke: "#444", textAlign: "center" },
+                  new go.Binding("text", "name")),
+          $(go.Panel, "Horizontal",
+            {
+              alignment: go.Spot.Top,
+              alignmentFocus: new go.Spot(0.5, 0, 0, 4)
+            },
+            inports),
+          $(go.Panel, "Horizontal",
+            {
+              alignment: go.Spot.Bottom,
+              alignmentFocus: new go.Spot(0.5, 1, 0, -4)
+            },
+            outports)                  
+          )
+        );
+        myDiagram.nodeTemplateMap.set(typename, node);
+      }          
+
+
+      makeTemplate("Audience", "images/Group.png", "#f4f4f4",
+        [],
+        [makePort("", false)]);
+
+      makeTemplate("Filter", "images/Filter.png", "#f9ffde",
+        [makePort("", true)],
+        [makePort("OUT", false)]);       
+
+      makeTemplate("Split", "images/Split.png", "#fce3ff",
+        [makePort("", true)],
+        [makePort("OUT", false)]);         
+
+      makeTemplate("Action", "images/Send.png", "#f0f8ff",
+        [makePort("", true)],
+        [makePort("OUT", false)]);      
+
+      makeRoundTemplate("Wait", "images/Clock.png", "#ffe4a6",
+        [makePort("", true)],
+        [makePort("OUT", false)], 100);           
+        
+      makeRoundTemplate("End", "images/End.png", "#fca4a4",
+        [makePort("", true)],
+        [], 60);            
+
+     /* makeTemplate("Filter", "images/filter.svg", "cornflowerblue",
+        [makePort("", true)],
+        [makePort("OUT", false), makePort("INV", false)]);*/
+
+ 
+      myDiagram.linkTemplate =
+        $(go.Link,
+          {
+            routing: go.Link.Orthogonal, corner: 5,
+            relinkableFrom: true, relinkableTo: true
+          },
+          $(go.Shape, { stroke: "#aaa", strokeWidth: 2 }),
+          $(go.Shape, { stroke: "#aaa", toArrow: "Standard" })
+        ); 
+
+      load();
+
+    }
+
+    // Show the diagram's model in JSON format that the user may edit
+    function save() {
+      document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+      myDiagram.isModified = false;
+    }
+    function load() {
+      let json = { 
+        "class": "go.GraphLinksModel",
+        "nodeCategoryProperty": "type",
+        "linkFromPortIdProperty": "frompid",
+        "linkToPortIdProperty": "topid",
+        "nodeDataArray": [
+          {"key":1, "type":"Audience", "name":"People who abandoned their carts in last 7 days."},
+          {"key":2, "type":"Table", "name":"Sales"},
+          {"key":3, "type":"Table", "name":"Period"},
+          {"key":4, "type":"Table", "name":"Store"},
+          {"key":11, "type":"Join", "name":"Product, Class"},
+          {"key":12, "type":"Join", "name":"Period"},
+          {"key":13, "type":"Join", "name":"Store"},
+          {"key":21, "type":"Project", "name":"Product, Class"},
+          {"key":31, "type":"Filter", "name":"Boston, Jan2014"},
+          {"key":32, "type":"Filter", "name":"Boston, 2014"},
+          {"key":41, "type":"Group", "name":"Sales"},
+          {"key":42, "type":"Group", "name":"Total Sales"},
+          {"key":51, "type":"Join", "name":"Product Name"},
+          {"key":61, "type":"Sort", "name":"Product Name"},
+          {"key":71, "type":"Export", "name":"File"}
+        ],
+        "linkDataArray": [
+          {"from":1, "frompid":"OUT", "to":11, "topid":"L"},
+          {"from":2, "frompid":"OUT", "to":11, "topid":"R"},
+          {"from":3, "frompid":"OUT", "to":12, "topid":"R"},
+          {"from":4, "frompid":"OUT", "to":13, "topid":"R"},
+          {"from":11, "frompid":"M", "to":12, "topid":"L"},
+          {"from":12, "frompid":"M", "to":13, "topid":"L"},
+          {"from":13, "frompid":"M", "to":21},
+          {"from":21, "frompid":"OUT", "to":31},
+          {"from":21, "frompid":"OUT", "to":32},
+          {"from":31, "frompid":"OUT", "to":41},
+          {"from":32, "frompid":"OUT", "to":42},
+          {"from":41, "frompid":"OUT", "to":51, "topid":"L"},
+          {"from":42, "frompid":"OUT", "to":51, "topid":"R"},
+          {"from":51, "frompid":"OUT", "to":61},
+          {"from":61, "frompid":"OUT", "to":71}
+        ]}
+
+      json = {
+        "class": "go.GraphLinksModel",
+        "nodeCategoryProperty": "type",
+        "linkFromPortIdProperty": "frompid",
+        "linkToPortIdProperty": "topid",
+        "nodeDataArray": [
+          {"key":1, "type":"Audience", "name":"People who abandoned their carts in last 7 days."},
+          {"key":3, "type":"Wait", "name":"Wait for 2 days", "size": 140},
+          {"key":4, "type":"Filter", "name":"People who placed an order in last 7 days."},
+          {"key":5, "type":"Split", "name":"Preferred mode of communication."},
+          {"key":6, "type":"Action", "name":"Send email"},
+          {"key":8, "type":"Action", "name":"Send SMS"},
+          {"key":9, "type":"End", "name":"End"},
+          {"key":10, "type":"End", "name":"End"}
+        ],
+        "linkDataArray": [
+          {"from":1, "frompid":"OUT", "to":4, "topid":"L"},
+          {"from":4, "frompid":"OUT", "to":5, "topid":"L"},
+          {"from":5, "frompid":"OUT", "to":6, "topid":"L", text: "Email"},
+          {"from":5, "frompid":"OUT", "to":8, "topid":"L", text: "SMS"}
+        ]
+      }
+      myDiagram.model = go.Model.fromJson(json);
+    }
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+
+<div id="sample">
+  <div id="myDiagramDiv" style="border: solid 1px black; width: 100%; height: 60vw"></div>
+</div>
+</body>
+<!--  This script is part of the gojs.net website, and is not needed to run the sample -->
+<script src="../assets/js/goSamples.js"></script>
+</html>

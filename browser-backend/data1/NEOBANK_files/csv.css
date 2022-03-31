@@ -1,0 +1,18 @@
+@charset "utf-8";
+
+/* siP', 'siD', 'siO', 'siPusd', 'siPaud */
+
+main [class^="si"].on,
+main [class*=" si"].on{
+  display: block;
+}
+main [class^="si"].off,
+main [class*=" si"].off{
+  display: none;
+}
+
+table td [class^="si"] > *:first-child,
+table td [class*=" si"] > *:first-child{
+  margin-top: 0;
+}
+
