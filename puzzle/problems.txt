@@ -1,0 +1,26 @@
+s + s + s = 75
+g + s + g = 35
+b + b + g = 13
+b + g x s = ?
+
+-----
+
+a + a + a = 30
+a + g + g = 20
+g + c + c = 9
+g + c x a = ?
+
+----
+
+coffee + coffee + coffee = 30
+coffee + cake + cake = 20
+cake + apple + apple = 9
+cake + apple x coffee = ?
+
+----
+
+apple + apple + apple = 90
+mango + mango + apple = 230
+guava + mango + apple = 210
+guava + mango - apple = ?
+
