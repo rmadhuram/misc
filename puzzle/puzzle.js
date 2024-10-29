@@ -7,7 +7,6 @@ guava + mango - apple = ?
 let varMap = {}
 
 function reduceLine(line) {
-  line = line.replaceAll(' ', '')
   let [expr, val] = line.split('=')
   let unknownVar = '', sum = 0, count = 0
   expr.split('+').forEach(v => {
@@ -22,7 +21,6 @@ function reduceLine(line) {
 }
 
 function solve(line) {
-  line = line.replaceAll(' ', '')
   line = line.replaceAll('x', '*')
   let [expr, val] = line.split('=')
   Object.keys(varMap).forEach(v => {
@@ -32,8 +30,8 @@ function solve(line) {
 }
 
 let lines = problem.split('\n')
-for (let line = 1; line < 4; line++ ) {
-  reduceLine(lines[line])
+for (let n = 1; n < 4; n++ ) {
+  reduceLine(lines[n].replaceAll(' ', ''))
 }
 console.log(varMap)
 console.log(solve(lines[4]))
